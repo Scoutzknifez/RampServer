@@ -106,12 +106,7 @@ public class Player : MonoBehaviour
         health -= damage;
         if (playerIsDead())
         {
-            health = 0f;
-            controller.enabled = false;
-            transform.position = NetworkManager.instance.getSpawnLocation();
-            ServerSend.PlayerPosition(this);
-
-            StartCoroutine(Respawn());
+            Kill();
         }
 
         ServerSend.PlayerHealth(this);
@@ -119,6 +114,8 @@ public class Player : MonoBehaviour
 
     public void Kill()
     {
+        health = 0f;
+
         controller.enabled = false;
         transform.position = NetworkManager.instance.getSpawnLocation();
         ServerSend.PlayerPosition(this);
