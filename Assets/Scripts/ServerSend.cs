@@ -107,5 +107,48 @@ public class ServerSend
         }
     }
 
+    public static void PlayerDisconnected(int playerId)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.playerDisconnected))
+        {
+            packet.Write(playerId);
+
+            SendTCPDataToAll(packet);
+        }
+    }
+
+    public static void PlayerHealth(Player player)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.playerHealth))
+        {
+            packet.Write(player.id);
+            packet.Write(player.health);
+
+            SendTCPDataToAll(packet);
+        }
+    }
+
+    public static void PlayerRespawned(Player player)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.playerRespawned))
+        {
+            packet.Write(player.id);
+
+            SendTCPDataToAll(packet);
+        }
+    }
+
+    public static void SpawnLevelPiece(int toClient, LevelPiece levelPiece)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.levelPieceSpawned))
+        {
+            packet.Write(levelPiece.position);
+            packet.Write(levelPiece.size);
+            packet.Write(levelPiece.rotation);
+            packet.Write(levelPiece.materialName);
+
+            SendTCPData(toClient, packet);
+        }
+    }
     #endregion
 }

@@ -7,10 +7,15 @@ public class Player : MonoBehaviour
     public int id;
     public string username;
     public CharacterController controller;
+    public Transform cameraTransform;
+    public float maxHealth = 1;
+    public float health = 1;
+
+
     public float gravity = -9.81f;
     public float moveSpeed = 5;
     public float jumpSpeed = 5;
-
+    
     private bool[] inputs;
     private float yVelocity = 0;
 
@@ -31,6 +36,11 @@ public class Player : MonoBehaviour
 
     public void FixedUpdate()
     {
+        if (playerIsDead())
+        {
+            return;
+        }
+
         Vector2 inputDirection = Vector2.zero;
         if (inputs[0])
         {
@@ -50,6 +60,12 @@ public class Player : MonoBehaviour
         }
 
         Move(inputDirection);
+    }
+
+    public void SetInput(bool[] _inputs, Quaternion _rotation)
+    {
+        inputs = _inputs;
+        transform.rotation = _rotation;
     }
 
     private void Move(Vector2 inputDirection)
@@ -74,9 +90,47 @@ public class Player : MonoBehaviour
         ServerSend.PlayerRotation(this);
     }
 
-    public void SetInput(bool[] _inputs, Quaternion _rotation)
+    public bool playerIsDead()
     {
-        inputs = _inputs;
-        transform.rotation = _rotation;
+        return health <= 0;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        // Do not hurt again if dead already
+        if (playerIsDead())
+        {
+            return;
+        }
+
+        health -= damage;
+        if (playerIsDead())
+        {
+            health = 0f;
+            controller.enabled = false;
+            transform.position = NetworkManager.instance.getSpawnLocation();
+            ServerSend.PlayerPosition(this);
+
+            StartCoroutine(Respawn());
+        }
+
+        ServerSend.PlayerHealth(this);
+    }
+
+    public void Kill()
+    {
+        controller.enabled = false;
+        transform.position = NetworkManager.instance.getSpawnLocation();
+        ServerSend.PlayerPosition(this);
+
+        StartCoroutine(Respawn());
+    }
+
+    private IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(3f);
+
+        controller.enabled = true;
+        ServerSend.PlayerRespawned(this);
     }
 }

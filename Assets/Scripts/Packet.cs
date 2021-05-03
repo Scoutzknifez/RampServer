@@ -10,7 +10,11 @@ public enum ServerPackets
     welcome = 1,
     spawnPlayer,
     playerPosition,
-    playerRotation
+    playerRotation,
+    playerDisconnected,
+    playerHealth,
+    playerRespawned,
+    levelPieceSpawned
 }
 
 /// <summary>Sent from client to server.</summary>

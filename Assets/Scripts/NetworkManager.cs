@@ -8,6 +8,10 @@ public class NetworkManager : MonoBehaviour
 
     public GameObject playerPrefab;
 
+    [Header("Spawn Settings")]
+    public Vector3 spawnCenter;
+    public Vector2 spawnSize;
+
     private void Awake()
     {
         if (instance == null)
@@ -32,6 +36,18 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         Server.Stop();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(spawnCenter, new Vector3(spawnSize.x, 0, spawnSize.y));
+    }
+
+    public Vector3 getSpawnLocation()
+    {
+        // TODO Math here for random
+        return spawnCenter;
     }
 
     public Player InstantiatePlayer()

@@ -213,6 +213,11 @@ public class Client
                 ServerSend.SpawnPlayer(client.id, player);
             }
         }
+
+        foreach (LevelPiece piece in StoreLevel.levelPieces)
+        {
+            ServerSend.SpawnLevelPiece(id, piece);
+        }
     }
 
     private void Disconnect()
@@ -227,5 +232,7 @@ public class Client
 
         tcp.Disconnect();
         udp.Disconnect();
+
+        ServerSend.PlayerDisconnected(id);
     }
 }
