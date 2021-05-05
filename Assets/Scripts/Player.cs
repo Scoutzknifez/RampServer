@@ -11,7 +11,6 @@ public class Player : MonoBehaviour
     public float maxHealth = 1;
     public float health = 1;
 
-
     public float gravity = -9.81f;
     public float moveSpeed = 5;
     public float jumpSpeed = 5;
@@ -60,6 +59,18 @@ public class Player : MonoBehaviour
         }
 
         Move(inputDirection);
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!hit.collider.gameObject.CompareTag("Ball"))
+        {
+            return;
+        }
+
+        // We are hitting a ball
+        GameObject ball = hit.collider.gameObject;
+        ball.GetComponent<Ball>().resetPlayerAndBall(gameObject);
     }
 
     public void SetInput(bool[] _inputs, Quaternion _rotation)
@@ -112,13 +123,16 @@ public class Player : MonoBehaviour
         ServerSend.PlayerHealth(this);
     }
 
+    public void SetHealth(float _health)
+    {
+        health = _health;
+        ServerSend.PlayerHealth(this);
+    }
+
     public void Kill()
     {
         health = 0f;
-
         controller.enabled = false;
-        transform.position = NetworkManager.instance.getSpawnLocation();
-        ServerSend.PlayerPosition(this);
 
         StartCoroutine(Respawn());
     }
@@ -126,6 +140,10 @@ public class Player : MonoBehaviour
     private IEnumerator Respawn()
     {
         yield return new WaitForSeconds(3f);
+
+        SetHealth(maxHealth);
+        transform.position = NetworkManager.instance.getSpawnLocation();
+        ServerSend.PlayerPosition(this);
 
         controller.enabled = true;
         ServerSend.PlayerRespawned(this);

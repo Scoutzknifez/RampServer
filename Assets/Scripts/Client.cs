@@ -195,6 +195,12 @@ public class Client
         player = NetworkManager.instance.InstantiatePlayer();
         player.Initialize(id, playerName);
 
+        LoadPlayers();
+        LoadLevel();
+    }
+
+    private void LoadPlayers()
+    {
         foreach (Client client in Server.clients.Values)
         {
             if (client.player != null)
@@ -213,10 +219,18 @@ public class Client
                 ServerSend.SpawnPlayer(client.id, player);
             }
         }
+    }
 
+    private void LoadLevel()
+    {
         foreach (LevelPiece piece in StoreLevel.levelPieces)
         {
             ServerSend.SpawnLevelPiece(id, piece);
+        }
+
+        foreach (Ball ball in Ball.balls.Values)
+        {
+            ServerSend.BallSpawn(id, ball);
         }
     }
 

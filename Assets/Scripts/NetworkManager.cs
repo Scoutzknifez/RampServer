@@ -41,7 +41,7 @@ public class NetworkManager : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(spawnCenter, new Vector3(spawnSize.x, 0, spawnSize.y));
+        Gizmos.DrawWireCube(spawnCenter, new Vector3(spawnSize.x, 2, spawnSize.y));
     }
 
     public Vector3 getSpawnLocation()
@@ -52,6 +52,6 @@ public class NetworkManager : MonoBehaviour
 
     public Player InstantiatePlayer()
     {
-        return Instantiate(playerPrefab, Vector3.zero, Quaternion.identity).GetComponent<Player>();
+        return Instantiate(playerPrefab, getSpawnLocation(), Quaternion.identity).GetComponent<Player>();
     }
 }

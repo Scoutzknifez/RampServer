@@ -14,7 +14,10 @@ public enum ServerPackets
     playerDisconnected,
     playerHealth,
     playerRespawned,
-    levelPieceSpawned
+    levelPieceSpawned,
+    ballSpawn,
+    ballActive,
+    ballRoll
 }
 
 /// <summary>Sent from client to server.</summary>

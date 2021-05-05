@@ -49,8 +49,10 @@ MonoBehaviour:
   id: 0
   username: 
   controller: {fileID: 2849612174941204836}
+  cameraTransform: {fileID: 0}
+  maxHealth: 1
   health: 1
-  gravity: -19.62
+  gravity: -15
   moveSpeed: 5
   jumpSpeed: 5
 --- !u!143 &2849612174941204836

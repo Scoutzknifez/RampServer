@@ -150,5 +150,59 @@ public class ServerSend
             SendTCPData(toClient, packet);
         }
     }
+
+    public static void BallSpawn(Ball ball)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.ballSpawn))
+        {
+            packet.Write(ball.id);
+            packet.Write(ball.isActive());
+            packet.Write(ball.transform.position);
+            packet.Write(ball.transform.rotation);
+            packet.Write(ball.transform.localScale);
+
+            SendTCPDataToAll(packet);
+        }
+    }
+
+    public static void BallSpawn(int toClient, Ball ball)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.ballSpawn))
+        {
+            packet.Write(ball.id);
+            packet.Write(ball.isActive());
+            packet.Write(ball.transform.position);
+            packet.Write(ball.transform.rotation);
+            packet.Write(ball.transform.localScale);
+
+            SendTCPData(toClient, packet);
+        }
+    }
+
+    public static void BallActive(Ball ball)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.ballActive))
+        {
+            packet.Write(ball.id);
+            packet.Write(ball.isActive());
+            packet.Write(ball.transform.position);
+            packet.Write(ball.transform.rotation);
+            packet.Write(ball.transform.localScale);
+
+            SendTCPDataToAll(packet);
+        }
+    }
+
+    public static void BallRoll(Ball ball)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.ballRoll))
+        {
+            packet.Write(ball.id);
+            packet.Write(ball.transform.position);
+            packet.Write(ball.transform.rotation);
+
+            SendUDPDataToAll(packet);
+        }
+    }
     #endregion
 }
