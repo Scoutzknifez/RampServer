@@ -12,7 +12,8 @@ public class Player : MonoBehaviour
     public float health = 1;
 
     public float gravity = -9.81f;
-    public float moveSpeed = 5;
+    public float moveSpeed = 3;
+    public float sprintMultiplier = 1.7f;
     public float jumpSpeed = 5;
     
     private bool[] inputs;
@@ -30,7 +31,7 @@ public class Player : MonoBehaviour
         id = _id;
         username = _username;
 
-        inputs = new bool[5];
+        inputs = new bool[6];
     }
 
     public void FixedUpdate()
@@ -83,6 +84,11 @@ public class Player : MonoBehaviour
     {
         Vector3 moveDirection = transform.right * inputDirection.x + transform.forward * inputDirection.y;
         moveDirection *= moveSpeed;
+
+        if (inputs[5])
+        {
+            moveDirection *= sprintMultiplier;
+        }
 
         if (controller.isGrounded)
         {

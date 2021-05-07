@@ -17,7 +17,8 @@ public enum ServerPackets
     levelPieceSpawned,
     ballSpawn,
     ballActive,
-    ballRoll
+    ballRoll,
+    ballCollided
 }
 
 /// <summary>Sent from client to server.</summary>

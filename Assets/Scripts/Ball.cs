@@ -35,6 +35,7 @@ public class Ball : MonoBehaviour
 
         // TODO: Make sure client gets explosion
         //Instantiate(explosionParticle, transform.position, transform.rotation);
+        ServerSend.BallCollided(transform.position);
         gameObject.SetActive(false);
         ServerSend.BallActive(this);
     }

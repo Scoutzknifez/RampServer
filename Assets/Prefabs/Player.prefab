@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1469990471729167364}
   - component: {fileID: 4857882562135516771}
   - component: {fileID: 2849612174941204836}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -52,8 +52,9 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   maxHealth: 1
   health: 1
-  gravity: -15
-  moveSpeed: 5
+  gravity: -14.715
+  moveSpeed: 3
+  sprintMultiplier: 1.7
   jumpSpeed: 5
 --- !u!143 &2849612174941204836
 CharacterController:
@@ -82,7 +83,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 690131526924912543}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CameraLocation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +115,7 @@ GameObject:
   - component: {fileID: 1028161610558219066}
   - component: {fileID: 5069180104248008613}
   - component: {fileID: 5827310070034282352}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}

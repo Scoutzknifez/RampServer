@@ -204,5 +204,15 @@ public class ServerSend
             SendUDPDataToAll(packet);
         }
     }
+
+    public static void BallCollided(Vector3 location)
+    {
+        using (Packet packet = new Packet((int)ServerPackets.ballCollided))
+        {
+            packet.Write(location);
+
+            SendTCPDataToAll(packet);
+        }
+    }
     #endregion
 }

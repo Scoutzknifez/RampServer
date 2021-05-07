@@ -63,14 +63,18 @@ public class Server
         try
         {
             IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            Debug.LogWarning("Here1.1");
             byte[] data = udpListener.EndReceive(result, ref clientEndPoint);
+            Debug.LogWarning("Here1.2");
             udpListener.BeginReceive(UDPReceiveCallback, null);
+            Debug.LogWarning("Here1.3");
 
             if (data.Length < 4)
             {
                 return;
             }
 
+            Debug.LogWarning("Here2");
             using (Packet packet = new Packet(data))
             {
                 int clientId = packet.ReadInt();
@@ -91,10 +95,14 @@ public class Server
                     clients[clientId].udp.HandleData(packet);
                 }
             }
+            Debug.LogWarning("Here3");
         }
         catch (Exception e)
         {
             Debug.Log($"Error receiving UDP data: {e}");
+            Debug.LogError(e.Message);
+            Debug.LogError(e.InnerException);
+            Debug.LogError(e.StackTrace);
         }
     }
 
