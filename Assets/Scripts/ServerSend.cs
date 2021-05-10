@@ -143,8 +143,27 @@ public class ServerSend
         using (Packet packet = new Packet((int)ServerPackets.levelPieceSpawned))
         {
             packet.Write(levelPiece.position);
-            packet.Write(levelPiece.size);
             packet.Write(levelPiece.rotation);
+
+            // Write the amount of vectors, then the vertices
+            packet.Write(levelPiece.vertices.Length);
+            foreach (Vector3 vector in levelPiece.vertices)
+            {
+                packet.Write(vector);
+            }
+
+            packet.Write(levelPiece.faces.Length);
+            foreach (ArrayPacker packer in levelPiece.faces)
+            {
+                packet.Write(packer);
+            }
+
+            packet.Write(levelPiece.sharedVertices.Length);
+            foreach (ArrayPacker packer in levelPiece.sharedVertices)
+            {
+                packet.Write(packer);
+            }
+
             packet.Write(levelPiece.materialName);
 
             SendTCPData(toClient, packet);

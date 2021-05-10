@@ -190,6 +190,17 @@ public class Packet : IDisposable
         Write(_value.z);
         Write(_value.w);
     }
+
+    /// <summary>Adds an ArrayPacker to the packet.</summary>
+    /// <param name="_value">The ArrayPacker to add.</param>
+    public void Write(ArrayPacker _value)
+    {
+        Write(_value.length);
+        foreach (int value in _value.array)
+        {
+            Write(value);
+        }
+    }
     #endregion
 
     #region Read Data

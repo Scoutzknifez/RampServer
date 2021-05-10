@@ -137,7 +137,7 @@ public class Player : MonoBehaviour
 
     public void Kill()
     {
-        health = 0f;
+        SetHealth(0f);
         controller.enabled = false;
 
         StartCoroutine(Respawn());

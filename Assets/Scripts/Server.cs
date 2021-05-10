@@ -16,6 +16,8 @@ public class Server
     private static TcpListener tcpListener;
     private static UdpClient udpListener;
 
+    private static bool closing = false;
+
     public static void Start(int _maxPlayers, int _port)
     {
         MaxPlayers = _maxPlayers;
@@ -36,6 +38,8 @@ public class Server
 
     public static void Stop()
     {
+        closing = true;
+
         tcpListener.Stop();
         udpListener.Close();
     }
@@ -60,10 +64,36 @@ public class Server
 
     private static void UDPReceiveCallback(IAsyncResult result)
     {
+        if (closing)
+        {
+            Debug.Log("Server shutdown.");
+            return;
+        }
+
         try
         {
             IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
             Debug.LogWarning("Here1.1");
+            // ERROR HAPPENS HERE
+            /*
+             * Error receiving UDP data: System.Net.Sockets.SocketException (0x80004005): An existing connection was forcibly closed by the remote host.
+             *  UnityEngine.Debug:Log (object)
+             *  Server:UDPReceiveCallback (System.IAsyncResult) (at Assets/Scripts/Server.cs:102)
+             *  System.Threading._ThreadPoolWaitCallback:PerformWaitCallback ()
+             *
+             * An existing connection was forcibly closed by the remote host.
+             *  UnityEngine.Debug:LogError (object)
+             *  Server:UDPReceiveCallback (System.IAsyncResult) (at Assets/Scripts/Server.cs:103)
+             *  System.Threading._ThreadPoolWaitCallback:PerformWaitCallback ()
+             *
+             *   at System.Net.Sockets.SocketAsyncResult.CheckIfThrowDelayedException () [0x00014] in <aa976c2104104b7ca9e1785715722c9d>:0 
+             *    at System.Net.Sockets.Socket.EndReceiveFrom (System.IAsyncResult asyncResult, System.Net.EndPoint& endPoint) [0x0003b] in <aa976c2104104b7ca9e1785715722c9d>:0 
+             *    at System.Net.Sockets.UdpClient.EndReceive (System.IAsyncResult asyncResult, System.Net.IPEndPoint& remoteEP) [0x00036] in <aa976c2104104b7ca9e1785715722c9d>:0 
+             *    at Server.UDPReceiveCallback (System.IAsyncResult result) [0x00016] in D:\Unity\Projects\RampServer\Assets\Scripts\Server.cs:67 
+             *  UnityEngine.Debug:LogError (object)
+             *  Server:UDPReceiveCallback (System.IAsyncResult) (at Assets/Scripts/Server.cs:105)
+             *  System.Threading._ThreadPoolWaitCallback:PerformWaitCallback ()
+             */
             byte[] data = udpListener.EndReceive(result, ref clientEndPoint);
             Debug.LogWarning("Here1.2");
             udpListener.BeginReceive(UDPReceiveCallback, null);
@@ -97,12 +127,20 @@ public class Server
             }
             Debug.LogWarning("Here3");
         }
+        catch (ObjectDisposedException e)
+        {
+            Debug.Log($"Server shutdown: {e}");
+        }
         catch (Exception e)
         {
             Debug.Log($"Error receiving UDP data: {e}");
             Debug.LogError(e.Message);
             Debug.LogError(e.InnerException);
             Debug.LogError(e.StackTrace);
+
+            // TODO Temp bandaid, possibly permanent?
+            // Either this or force disconnect?
+            udpListener.BeginReceive(UDPReceiveCallback, null);
         }
     }
 

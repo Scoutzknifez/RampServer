@@ -11,6 +11,10 @@ public class StoreLevel : MonoBehaviour
     public Material fallbackLevelMaterial;
     public MaterialMapping[] levelMaterials;
 
+    [Header("Testing")]
+    public bool isTesting;
+    public Vector3 offset;
+
     private void Start()
     {
         if (fallbackLevelMaterial == null)
@@ -22,16 +26,35 @@ public class StoreLevel : MonoBehaviour
         foreach (Transform child in transform)
         {
             GameObject go = child.gameObject;
-            Quaternion beforeRot = go.transform.rotation;
+            ProBuilderMesh mainMesh = go.GetComponent<ProBuilderMesh>();
 
-            // START Change pieces to allow correct calculations to send
-            go.transform.rotation = Quaternion.identity;
-            // END
+            ArrayPacker[] faces = new ArrayPacker[mainMesh.faces.Count];
+            for (int i = 0; i < faces.Length; i++)
+            {
+                int[] faceVerts = new int[mainMesh.faces[i].indexes.Count];
+                mainMesh.faces[i].indexes.CopyTo(faceVerts, 0);
+
+                faces[i] = new ArrayPacker(faceVerts);
+            }
+
+            Vector3[] vertices = new Vector3[mainMesh.positions.Count];
+            for (int i = 0; i < mainMesh.positions.Count; i++)
+            {
+                vertices[i] = mainMesh.positions[i];
+            }
+
+            ArrayPacker[] sharedVertices = new ArrayPacker[mainMesh.sharedVertices.Count];
+            for (int i = 0; i < mainMesh.sharedVertices.Count; i++)
+            {
+                int[] sharedVertex = new int[mainMesh.sharedVertices[i].Count];
+                mainMesh.sharedVertices[i].CopyTo(sharedVertex, 0);
+
+                sharedVertices[i] = new ArrayPacker(sharedVertex);
+            }
+
+            LevelPiece piece = new LevelPiece(go.transform.position, go.transform.rotation, vertices, faces, sharedVertices);
 
             Renderer renderer = go.GetComponent<Renderer>();
-
-            LevelPiece piece = new LevelPiece(go.transform.position, renderer.bounds.size, beforeRot);
-
             MaterialMapping mapping = MaterialMapping.GetMaterialMappingFromMaterial(levelMaterials, renderer.sharedMaterial);
 
             if (mapping != null)
@@ -44,13 +67,13 @@ public class StoreLevel : MonoBehaviour
             }
 
             levelPieces.Add(piece);
-
-            // Reset piece back to prestart
-            go.transform.rotation = beforeRot;
         }
 
         // Was for testing to see duplicated data
-        //StartCoroutine(spawnBack());
+        if (isTesting)
+        {
+            StartCoroutine(spawnBack());
+        }
     }
 
     /*
@@ -59,16 +82,34 @@ public class StoreLevel : MonoBehaviour
      */
     IEnumerator spawnBack()
     {
-        yield return new WaitForSeconds(1f);
-
-        Vector3 offset = new Vector3(30, 0, 0);
+        yield return new WaitForSeconds(0.1f);        
 
         GameObject level = new GameObject("[LOADED LEVEL]");
 
         foreach (LevelPiece data in levelPieces)
         {
-            ProBuilderMesh mesh = ShapeGenerator.GenerateCube(PivotLocation.Center, data.size);
-            GameObject generatedObject = mesh.gameObject;
+            List<Vertex> vertices = new List<Vertex>();
+            foreach (Vector3 position in data.vertices)
+            {
+                Vertex newPoint = new Vertex();
+                newPoint.position = position;
+                vertices.Add(newPoint);
+            }
+
+            List<Face> faces = new List<Face>();
+            foreach (ArrayPacker face in data.faces)
+            {
+                faces.Add(new Face(face.array));
+            }
+
+            List<SharedVertex> sharedVertices = new List<SharedVertex>();
+            foreach (ArrayPacker shared in data.sharedVertices)
+            {
+                sharedVertices.Add(new SharedVertex(shared.array));
+            }
+
+            ProBuilderMesh pbMesh = ProBuilderMesh.Create(vertices, faces, sharedVertices);
+            GameObject generatedObject = pbMesh.gameObject;
 
             generatedObject.transform.position = offset + data.position;
             generatedObject.transform.rotation = data.rotation;
@@ -94,16 +135,33 @@ public class StoreLevel : MonoBehaviour
 public class LevelPiece
 {
     public Vector3 position;
-    public Vector3 size;
     public Quaternion rotation;
+
+    public Vector3[] vertices;
+    public ArrayPacker[] faces;
+    public ArrayPacker[] sharedVertices;
 
     public string materialName;
 
-    public LevelPiece(Vector3 _pos, Vector3 _size, Quaternion _rot)
+    public LevelPiece(Vector3 _pos, Quaternion _rot, Vector3[] _vertices, ArrayPacker[] _faces, ArrayPacker[] _sharedVertices)
     {
         position = _pos;
-        size = _size;
         rotation = _rot;
+        vertices = _vertices;
+        faces = _faces;
+        sharedVertices = _sharedVertices;
+    }
+}
+
+public class ArrayPacker
+{
+    public int length;
+    public int[] array;
+
+    public ArrayPacker(int[] _elements)
+    {
+        array = _elements;
+        length = array.Length;
     }
 }
 
